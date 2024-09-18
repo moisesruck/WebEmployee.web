@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using WebEmployee.web.Data;
 using WebEmployee.web.Data.Repository.IRepository;
 using WebEmployee.web.Data.Repository;
+using WebEmployee.web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ o.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection")
 
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddHttpClient<CountryStateCityService>();
 
 var app = builder.Build();
 

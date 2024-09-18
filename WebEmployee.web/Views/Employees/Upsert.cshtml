@@ -101,20 +101,19 @@
 
                         </div>
                         <div class="form-floating py-2 col-12">
-                            <input asp-for="@Model.BirthPlaceCity" class="form-control border-0 shadow" />
-                            <label asp-for="@Model.BirthPlaceCity" class="ms-2 text-muted"></label>
-                            <span asp-validation-for="@Model.BirthPlaceCity" class="text-danger"></span>
-                        </div>
-                        <div class="form-floating py-2 col-12">
-                            <input asp-for="@Model.BirthPlaceState" class="form-control border-0 shadow" />
-                            <label asp-for="@Model.BirthPlaceState" class="ms-2 text-muted"></label>
-                            <span asp-validation-for="@Model.BirthPlaceState" class="text-danger"></span>
-                        </div>
-                        <div class="form-floating py-2 col-12">
-                            <input asp-for="@Model.BirthPlaceCountry" class="form-control border-0 shadow" />
-                            <label asp-for="@Model.BirthPlaceCountry" class="ms-2 text-muted"></label>
+                            <select asp-for="@Model.BirthPlaceCountry" class="form-control border-0 shadow"></select>
                             <span asp-validation-for="@Model.BirthPlaceCountry" class="text-danger"></span>
                         </div>
+                        <div class="form-floating py-2 col-12">
+                            <select asp-for="@Model.BirthPlaceState" class="form-control border-0 shadow"></select>
+                            <span asp-validation-for="@Model.BirthPlaceState" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating py-2 col-12">
+                            <select asp-for="@Model.BirthPlaceCity" class="form-control border-0 shadow"></select>
+                            <span asp-validation-for="@Model.BirthPlaceCity" class="text-danger"></span>
+                        </div>
+
                     </div>
                 </div>
                 <div class="row pt-4">
@@ -162,6 +161,42 @@
             }
         }
 
+        $(document).ready(function () {
+            $.get("/api/location/countries", function (data) {
+                let countries = JSON.parse(data);
+                $('#BirthPlaceCountry').empty().append('<option>Select Country</option>');
+                $.each(countries, function (key, value) {
+                    $('#BirthPlaceCountry').append($('<option></option>').val(value.iso2).text(value.name));
+                });
+            });
+
+            $('#BirthPlaceCountry').change(function () {
+                let countryIso = $(this).val();
+                if (countryIso) {
+                    $.get("/api/location/states/" + countryIso, function (data) {
+                        let states = JSON.parse(data);
+                        $('#BirthPlaceState').empty().append('<option>Select State</option>');
+                        $.each(states, function (key, value) {
+                            $('#BirthPlaceState').append($('<option></option>').val(value.iso2).text(value.name));
+                        });
+                    });
+                }
+            });
+
+            $('#BirthPlaceState').change(function () {
+                let countryIso = $('#BirthPlaceCountry').val();
+                let stateIso = $(this).val();
+                if (countryIso && stateIso) {
+                    $.get("/api/location/cities/" + countryIso + "/" + stateIso, function (data) {
+                        let cities = JSON.parse(data);
+                        $('#BirthPlaceCity').empty().append('<option>Select City</option>');
+                        $.each(cities, function (key, value) {
+                            $('#BirthPlaceCity').append($('<option></option>').val(value.name).text(value.name));
+                        });
+                    });
+                }
+            });
+        });
     </script>
 
 
