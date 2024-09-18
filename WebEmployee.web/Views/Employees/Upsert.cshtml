@@ -1,0 +1,172 @@
+﻿@model Employee
+
+
+<div class="card shadow border-0 mt-4" style="background-color:transparent">
+    <div class="card-header bg-gradient m-lg-0 py-3" style="background-color:var(--brand-blue)">
+        <div class="row">
+            <div class="col-3 text-start px-0">
+                <a class="btn fw-bold bg-gradient  py-2 text-uppercase" style="background-color:var(--brand-gray); color:var(--brand-orange)"
+                   asp-action="Index">
+                    ATRAS
+                </a>
+            </div>
+            <div class="col-6 text-center">
+                <h2 class="text-white py-2">@(Model.Id != 0 ? "Actualizar" : "Crear") Employee</h2>
+            </div>
+            <div class="col-3 d-flex justify-content-end align-items-center" style="background-color:transparent">
+                <div class="btn-group" role="group">
+                    <a href="" class="btn fw-bold" adesign="hotpink"> <i class=" fw-bold bi bi-bell-fill h2"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body p-4">
+        <form method="post" class="row" enctype="multipart/form-data">
+            <input asp-for="@Model.Id" hidden />
+
+
+            <div class="border p-0" style="background-color:transparent">
+
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-lg-4 text-start mb-3" style="background-color:transparent">
+                        @*   <div class="mb-2">
+                        <img id="img_employee" height="200" width="200" class="border rounded mx-auto d-block img-fluid" />
+                        </div> *@
+                        @if (Model.EmployeeImages != null && Model.EmployeeImages.Count > 0)
+                        {
+
+
+                            <img src="@Model.EmployeeImages[0].ImageUrl" id="imgClickAndChange" class="d-block w-100 pb-5" alt="...">
+
+                            <div class="row">
+                            @foreach (var imageWithIndex in Model.EmployeeImages.Select((image, index) => new { EmployeeImage = image, Index = index }))
+                            {
+                              
+                                    <div class="col-2" style="background-color:transparent">
+                                        <img src="@imageWithIndex.EmployeeImage.ImageUrl" height="30" width="30" onclick="showImage(" @imageWithIndex.EmployeeImage.ImageUrl")" alt="...">
+                                        <br />
+                                        <i class="bi bi-trash"></i>
+
+                                    </div>
+                                   
+                                
+                            }
+                            </div>
+
+                        }
+                        <div class="mb-4">
+                            <label asp-for="EmployeeImages" class="form-label">Fotografia del Empleado</label>
+                            <input asp-for="EmployeeImages" name="filess" class="form-control" type="file" id="fileEmployee" accept="image/png, image/png, image/jpeg" multiple />
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-4 col-lg-4">
+
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="@Model.Name" class="form-control border-0 shadow" />
+                            <label asp-for="@Model.Name" class="ms-2 text-muted"></label>
+                            <span asp-validation-for="@Model.Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="@Model.Lastname" class="form-control border-0 shadow" />
+                            <label asp-for="@Model.Lastname" class="ms-2 text-muted"></label>
+                            <span asp-validation-for="@Model.Lastname" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="@Model.EmployeeBadge" class="form-control border-0 shadow" />
+                            <label asp-for="@Model.EmployeeBadge" class="ms-2 text-muted"></label>
+                            <span asp-validation-for="@Model.EmployeeBadge" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="@Model.NationalId" class="form-control border-0 shadow" />
+                            <label asp-for="@Model.NationalId" class="ms-2 text-muted"></label>
+                            <span asp-validation-for="@Model.NationalId" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="@Model.DateofBirth" class="form-control border-0 shadow" type="date" id="txtbirthdate" />
+                            <label asp-for="@Model.DateofBirth" class="ms-2 text-muted"></label>
+                            <span asp-validation-for="@Model.DateofBirth" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-md-4 col-lg-4">
+                       
+                        <div class="form-floating py-2 col-12">
+
+                            @*   <select asp-for="PositionId" asp-items="@Model.PositionList" class="form-select border-0 shadow" id="txtposition">
+                            <option disabled selected class="text-black">--Seleccionar Posicion--</option>
+
+                            </select>
+                            <label asp-for="@Model.Employee.Position" class="ms-2 text-muted"></label> *@
+
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="@Model.BirthPlaceCity" class="form-control border-0 shadow" />
+                            <label asp-for="@Model.BirthPlaceCity" class="ms-2 text-muted"></label>
+                            <span asp-validation-for="@Model.BirthPlaceCity" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="@Model.BirthPlaceState" class="form-control border-0 shadow" />
+                            <label asp-for="@Model.BirthPlaceState" class="ms-2 text-muted"></label>
+                            <span asp-validation-for="@Model.BirthPlaceState" class="text-danger"></span>
+                        </div>
+                        <div class="form-floating py-2 col-12">
+                            <input asp-for="@Model.BirthPlaceCountry" class="form-control border-0 shadow" />
+                            <label asp-for="@Model.BirthPlaceCountry" class="ms-2 text-muted"></label>
+                            <span asp-validation-for="@Model.BirthPlaceCountry" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row pt-4">
+
+                    <div class="col-6 col-md-6 pb-1">
+                        @if (Model.Id != 0)
+                        {
+                            <button type="submit" buttondesign="blue" class="btn form-control">Update</button>
+                            @* <button onclick="mostsrarImagen(@Model.EmployeeImages[4].ImageUrl)" buttondesign="blue" class="btn">Update</button> *@
+                        }
+                        else
+                        {
+                            <button type="submit" buttondesign="blue" class="btn form-control">Create</button>
+                        }
+                    </div>
+                    <div class="col-6 col-md-6 pb-1">
+                        <a asp-controller="employees" asp-action="Index" adesign="gray" class="btn border form-control">Cancelar</a>
+                    </div>
+                </div>
+                <div asp-validation-summary=All class="text-danger"></div>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+@section Scripts {
+    <script>
+
+        // function mostrarImagen(input) {
+
+        //     if (input.files) {
+        //         var reader = new FileReader();
+
+        //         reader.onload = function (e) {
+        //             $("#img_employee").attr("src", e.target.result).width(200).height(200)
+        //         }
+        //         reader.readAsDataURL(input.files[0]);
+        //     }
+        // }
+
+        function showImage(input) {
+            if (input != null) {
+                document.getElementById("imgClickAndChange").src = input;
+            }
+        }
+
+    </script>
+
+
+    @{
+        //enable client side validation
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

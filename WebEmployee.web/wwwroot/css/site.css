@@ -1,0 +1,219 @@
+:root {
+    --brand-blue: #0097B2;
+    --brand-orange: #FF7F50;
+    --brand-pink: hotpink;
+    --brand-gray: #eeeeee;
+}
+
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+
+.sidenav {
+    width: 130px;
+    position: fixed;
+    z-index: 1;
+    bottom: 100px;
+    left: 10px;
+    /* background: #eee; */
+    background: var(--brand-gray);
+    overflow-x: hidden;
+    padding: 8px 0;
+    border-radius: 10px;
+}
+
+    .sidenav a {
+        padding: 6px 8px 6px 16px;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 400;
+        color: var(--brand-blue);
+        display: block;
+    }
+
+        .sidenav a:hover {
+            color: floralwhite;
+            background-color: var(--brand-blue);
+        }
+
+
+button[buttondesign="blue"] {
+    background-color: var(--brand-blue);
+    display: inline-block;
+    color: #fff;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+}
+
+button[buttondesign="gray"] {
+    background-color: var(--brand-gray);
+    display: inline-block;
+    color: var(--brand-blue);
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+}
+
+button[buttondesign="pink"] {
+    background-color: var(--brand-pink);
+    display: inline-block;
+    color: #fff;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+}
+
+button[buttondesign="orange"] {
+    background-color: var(--brand-orange);
+    display: inline-block;
+    color: #fff;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+}
+
+
+
+
+a[adesign="pink"] {
+    background-color: var(--brand-pink);
+    display: inline-block;
+    color: #fff;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+}
+
+a[adesign="orange"] {
+    background-color: var(--brand-orange);
+    display: inline-block;
+    color: #fff;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+}
+
+a[adesign="gray"] {
+    background-color: var(--brand-gray);
+    display: inline-block;
+    color: var(--brand-orange);
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    /*    border-radius: 0.25rem;
+*/ border-radius: 0.25rem;
+}
+
+a[adesign="blue"] {
+    background-color: var(--brand-blue);
+    display: inline-block;
+    color: #fff;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+}
+
+h4[division="blue"] {
+    background-color: var(--brand-blue);
+    color: #fff;
+    font-weight: 600;
+    line-height: 1.5;
+    padding-left: 10px;
+}
+
+h4[division="pink"] {
+    background-color: var(--brand-pink);
+    color: #fff;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+
+h4[division="orange"] {
+    background-color: var(--brand-orange);
+    color: #fff;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+h4[division="gray"] {
+    background-color: var(--brand-gray);
+    color: var(--brand-blue);
+    font-weight: 600;
+    line-height: 1.5;
