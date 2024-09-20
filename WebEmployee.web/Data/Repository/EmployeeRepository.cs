@@ -14,8 +14,7 @@ namespace WebEmployee.web.Data.Repository
 
         public void Update(Employee obj)
         {
-   
-
+                
             var objFromdb = _db.Employees.FirstOrDefault(u => u.Id == obj.Id);
 
             if (objFromdb != null)

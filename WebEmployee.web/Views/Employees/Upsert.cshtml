@@ -39,14 +39,18 @@
 
                             <img src="@Model.EmployeeImages[0].ImageUrl" id="imgClickAndChange" class="d-block w-100 pb-5" alt="...">
 
-                            <div class="row">
-                            @foreach (var imageWithIndex in Model.EmployeeImages.Select((image, index) => new { EmployeeImage = image, Index = index }))
+                            <div class="row" >
+                            @foreach (var imageWithIndex in Model.EmployeeImages.Select((image, index) => new { EmployeeImage = image, Index = index,Id = image.Id }))
                             {
-                              
-                                    <div class="col-2" style="background-color:transparent">
-                                        <img src="@imageWithIndex.EmployeeImage.ImageUrl" height="30" width="30" onclick="showImage(" @imageWithIndex.EmployeeImage.ImageUrl")" alt="...">
+
+                                    <div class="col-2" style="background-color:transparent" id="imageContainer_@imageWithIndex.Index">
+                                      @*   <img src="@imageWithIndex.EmployeeImage.ImageUrl" height="30" width="30" onclick="showImageInDiv('@imageWithIndex.EmployeeImage.ImageUrl')" alt="..."> *@
+                                        <img src="@imageWithIndex.EmployeeImage.ImageUrl" height="30" width="30"
+                                             onclick="showImageInDiv('@imageWithIndex.EmployeeImage.ImageUrl.Replace(@"\", @"\\")')" alt="...">
+
+
                                         <br />
-                                        <i class="bi bi-trash"></i>
+                                        <i class="bi bi-trash" onclick="confirmDelete(@imageWithIndex.Id)"></i>
 
                                     </div>
                                    
@@ -55,9 +59,26 @@
                             </div>
 
                         }
-                        <div class="mb-4">
-                            <label asp-for="EmployeeImages" class="form-label">Fotografia del Empleado</label>
-                            <input asp-for="EmployeeImages" name="filess" class="form-control" type="file" id="fileEmployee" accept="image/png, image/png, image/jpeg" multiple />
+                        @if (Model.Id > 0)
+                        {
+                            <div class="mb-4">
+                                <label asp-for="EmployeeImages" class="form-label">Fotografia del Empleado</label>
+                                <input asp-for="EmployeeImages" name="filess" class="form-control" type="file" id="fileEmployee" accept="image/png, image/png, image/jpeg" multiple onchange="previewImagesUpdate()" />
+                            </div>
+
+                        }
+                        else
+                        {
+                            <div class="mb-4">
+                                <label asp-for="EmployeeImages" class="form-label">Fotografia del Empleado</label>
+                                <input asp-for="EmployeeImages" name="filess" class="form-control" type="file" id="fileEmployee" accept="image/png, image/png, image/jpeg" multiple onchange="previewImages()" />
+                            </div>
+                        }
+                        <div class="row" id="imagePreviewRow"></div>
+                      
+                        <div id="imagePreviewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:9999; overflow:hidden;">
+                            <img id="previewImage" src="" style="max-width:90%; max-height:90%;" alt="Preview" />
+                            <button type="button" onclick="closeImageModal()" style="position:absolute; top:10px; right:20px; color:white; font-size:24px;">&times;</button>
                         </div>
                     </div>
                     <div class="col-sm-12 col-md-4 col-lg-4">
@@ -155,11 +176,6 @@
         //     }
         // }
 
-        function showImage(input) {
-            if (input != null) {
-                document.getElementById("imgClickAndChange").src = input;
-            }
-        }
 
         $(document).ready(function () {
             $.get("/api/location/countries", function (data) {
@@ -197,11 +213,159 @@
                 }
             });
         });
+
+
+        function previewImages() {
+            const fileInput = document.getElementById('fileEmployee');
+            const previewRow = document.getElementById('imagePreviewRow');
+            previewRow.innerHTML = ''; 
+
+            Array.from(fileInput.files).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imgDiv = document.createElement('div');
+                    imgDiv.classList.add('col-2');
+                    imgDiv.style.backgroundColor = 'transparent';
+
+                    imgDiv.innerHTML = `
+                            <img src="${e.target.result}" height="30" width="30" onclick="showImage('${e.target.result}')" alt="..."/>
+                            <br>
+                            <i class="bi bi-trash" onclick="removeImage(${index})"></i>
+                        `;
+
+                    previewRow.appendChild(imgDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+       
+        function removeImage(index) {
+            const fileInput = document.getElementById('fileEmployee');
+            const dt = new DataTransfer();
+            const files = fileInput.files;
+
+            Array.from(files).forEach((file, i) => {
+                if (i !== index) {
+                    dt.items.add(file); 
+                }
+            });
+
+            fileInput.files = dt.files;
+            previewImages();
+        }
+
+        function showImage(src) {
+            const modal = document.getElementById('imagePreviewModal');
+            const modalImage = document.getElementById('previewImage');
+            modalImage.src = src;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageModal() {
+            document.getElementById('imagePreviewModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+
+        function showImageInDiv(imageUrl) {
+            document.getElementById('imgClickAndChange').src = imageUrl;
+        }
+
+        function removeImageUpdate(index) {
+            document.getElementById('imageContainer_' + index).remove();
+        }
+
+        function previewImagesUpdate() {
+            var files = document.getElementById('fileEmployee').files;
+            var imagePreviewRow = document.getElementById('imagePreviewRow');
+            imagePreviewRow.innerHTML = ''; 
+
+            for (var i = 0; i < files.length; i++) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var imgDiv = document.createElement('div');
+                    imgDiv.classList.add('col-2');
+                    imgDiv.style.backgroundColor = 'transparent';
+
+                    var img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.height = 30;
+                    img.width = 30;
+                    img.onclick = function () {
+                        showImage(e.target.result);
+                    };
+
+                    var trashIcon = document.createElement('i');
+                    trashIcon.classList.add('bi', 'bi-trash');
+                    trashIcon.onclick = function () {
+                        imgDiv.remove();
+                    };
+
+                    imgDiv.appendChild(img);
+                    imgDiv.appendChild(document.createElement('br'));
+                    imgDiv.appendChild(trashIcon);
+
+                    imagePreviewRow.appendChild(imgDiv);
+                }
+                reader.readAsDataURL(files[i]);
+            }
+        }
+
+
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteEmployeeImage(id);
+                }
+            })
+        }
+
+        function deleteEmployeeImage(id) {
+            $.ajax({
+                type: 'DELETE',
+                url: '/Employees/DeleteImage/' + id,
+                success: function (response) {
+
+                    debugger;
+                    if (response.success) {
+                        debugger;
+                        Swal.fire(
+                            'Deleted!',
+                            'Your file has been deleted.',
+                            'success'
+                        );
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message,
+                            'error'
+                        );
+                    }
+                },
+                error: function () {
+                    Swal.fire(
+                        'Error!',
+                        'Something went wrong!',
+                        'error'
+                    );
+                }
+            });
+        }
     </script>
 
 
     @{
         //enable client side validation
-        <partial name="_ValidationScriptsPartial" />
+            <partial name="_ValidationScriptsPartial" />
     }
 }

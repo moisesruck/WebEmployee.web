@@ -163,17 +163,15 @@ namespace WebEmployee.web.Controllers
                             EmployeeId = employe.Id
                         };
 
-                        //Confirm Pacient images is not null, if it is, initialize it
-                        if (employe.EmployeeImages == null)
-                        {
-                            employe.EmployeeImages = new List<EmployeeImage>();
-                        }
+                        ////Confirm Pacient images is not null, if it is, initialize it
+                        //if (employe.EmployeeImages == null)
+                        //{
+                        //    employe.EmployeeImages = new List<EmployeeImage>();
+                        //}
+                        _unitOfWork.EmployeeImagee.Add(EmployeeImage);
+                        _unitOfWork.Save();
 
-                        //add the idividual pacient image to the list
-                        employe.EmployeeImages.Add(EmployeeImage);
                     }
-                    _unitOfWork.Employee.Update(employe);
-                    _unitOfWork.Save();
                 }
                 TempData["success"] = "Empleado public creado exitosamente";
                 return RedirectToAction("Index", "Employees");
@@ -209,6 +207,20 @@ namespace WebEmployee.web.Controllers
             _unitOfWork.Save();
 
             List<Employee> objCategoryList = _unitOfWork.Employee.GetAll().ToList();
+            return Json(new { success = true, message = "Delete Successful" });
+        }
+        [HttpDelete]
+        public IActionResult DeleteImage(int? id)
+        {
+
+            var employeeImage = _unitOfWork.EmployeeImagee.Get(u => u.Id == id);
+
+            if (employeeImage == null)
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+            _unitOfWork.EmployeeImagee.Remove(employeeImage);
+            _unitOfWork.Save();
             return Json(new { success = true, message = "Delete Successful" });
         }
         #endregion
