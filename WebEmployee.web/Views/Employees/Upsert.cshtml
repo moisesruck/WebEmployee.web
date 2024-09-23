@@ -25,6 +25,9 @@
         <form method="post" class="row" enctype="multipart/form-data">
             <input asp-for="@Model.Id" hidden />
 
+            <input id="hCountry" value="@Model.BirthPlaceCountry" hidden/>
+            <input id="hState" value="@Model.BirthPlaceState" hidden/>
+            <input id="hCity" value="@Model.BirthPlaceCity" hidden/>
 
             <div class="border p-0" style="background-color:transparent">
 
@@ -39,12 +42,12 @@
 
                             <img src="@Model.EmployeeImages[0].ImageUrl" id="imgClickAndChange" class="d-block w-100 pb-5" alt="...">
 
-                            <div class="row" >
-                            @foreach (var imageWithIndex in Model.EmployeeImages.Select((image, index) => new { EmployeeImage = image, Index = index,Id = image.Id }))
-                            {
+                            <div class="row">
+                                @foreach (var imageWithIndex in Model.EmployeeImages.Select((image, index) => new { EmployeeImage = image, Index = index, Id = image.Id }))
+                                {
 
                                     <div class="col-2" style="background-color:transparent" id="imageContainer_@imageWithIndex.Index">
-                                      @*   <img src="@imageWithIndex.EmployeeImage.ImageUrl" height="30" width="30" onclick="showImageInDiv('@imageWithIndex.EmployeeImage.ImageUrl')" alt="..."> *@
+                                        @*   <img src="@imageWithIndex.EmployeeImage.ImageUrl" height="30" width="30" onclick="showImageInDiv('@imageWithIndex.EmployeeImage.ImageUrl')" alt="..."> *@
                                         <img src="@imageWithIndex.EmployeeImage.ImageUrl" height="30" width="30"
                                              onclick="showImageInDiv('@imageWithIndex.EmployeeImage.ImageUrl.Replace(@"\", @"\\")')" alt="...">
 
@@ -53,9 +56,9 @@
                                         <i class="bi bi-trash" onclick="confirmDelete(@imageWithIndex.Id)"></i>
 
                                     </div>
-                                   
-                                
-                            }
+
+
+                                }
                             </div>
 
                         }
@@ -75,7 +78,7 @@
                             </div>
                         }
                         <div class="row" id="imagePreviewRow"></div>
-                      
+
                         <div id="imagePreviewModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:9999; overflow:hidden;">
                             <img id="previewImage" src="" style="max-width:90%; max-height:90%;" alt="Preview" />
                             <button type="button" onclick="closeImageModal()" style="position:absolute; top:10px; right:20px; color:white; font-size:24px;">&times;</button>
@@ -111,7 +114,7 @@
                     </div>
 
                     <div class="col-sm-12 col-md-4 col-lg-4">
-                       
+
                         <div class="form-floating py-2 col-12">
 
                             @*   <select asp-for="PositionId" asp-items="@Model.PositionList" class="form-select border-0 shadow" id="txtposition">
@@ -135,6 +138,33 @@
                             <span asp-validation-for="@Model.BirthPlaceCity" class="text-danger"></span>
                         </div>
 
+                        <div class="form-floating py-2 col-12">
+                            <select asp-for="@Model.EmployeeTypeId" class="form-control border-0 shadow select2">
+                                <option value="">Select Employee Type</option>
+                                @if (ViewBag.EmployeeTypes != null)
+                                {
+                                    foreach (var item in ViewBag.EmployeeTypes)
+                                    {
+                                        <option value="@item.Id">@item.Type</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="@Model.EmployeeTypeId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating py-2 col-12">
+                            <select asp-for="@Model.BossId" class="form-control border-0 shadow select2">
+                                <option value="">Select Reporting To</option>
+                                @if (ViewBag.Employees != null)
+                                {
+                                    foreach (var item in ViewBag.Employees)
+                                    {
+                                        <option value="@item.Id">@item.Name @item.Lastname</option>
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="@Model.BossId" class="text-danger"></span>
+                        </div>
                     </div>
                 </div>
                 <div class="row pt-4">
@@ -178,28 +208,71 @@
 
 
         $(document).ready(function () {
+
+            $('.select2').select2({
+                allowClear: true
+            });
+
             $.get("/api/location/countries", function (data) {
+                var country = $("#hCountry").val();
+
                 let countries = JSON.parse(data);
                 $('#BirthPlaceCountry').empty().append('<option>Select Country</option>');
                 $.each(countries, function (key, value) {
-                    $('#BirthPlaceCountry').append($('<option></option>').val(value.iso2).text(value.name));
+                    if (country !== "" && country !== null) {
+                        if (value.iso2 === country) {
+                            $('#BirthPlaceCountry').append($('<option></option>').val(value.iso2).text(value.name).prop('selected', true));
+                        }
+                        else {
+                            $('#BirthPlaceCountry').append($('<option></option>').val(value.iso2).text(value.name));
+
+                        }
+                    }
+                    else {
+                        $('#BirthPlaceCountry').append($('<option></option>').val(value.iso2).text(value.name));
+
+                    }
                 });
+                if (country !== "" && country !== null) {
+                    $('#BirthPlaceCountry').trigger('change');
+                }
+              
             });
 
             $('#BirthPlaceCountry').change(function () {
+                var state = $("#hState").val();
+
                 let countryIso = $(this).val();
                 if (countryIso) {
                     $.get("/api/location/states/" + countryIso, function (data) {
                         let states = JSON.parse(data);
                         $('#BirthPlaceState').empty().append('<option>Select State</option>');
                         $.each(states, function (key, value) {
-                            $('#BirthPlaceState').append($('<option></option>').val(value.iso2).text(value.name));
+                            if (state !== "" && state !== null) {
+                                if (state === value.iso2) {
+                                    $('#BirthPlaceState').append($('<option></option>').val(value.iso2).text(value.name).prop('selected', true));
+                                }
+                                else {
+                                    $('#BirthPlaceState').append($('<option></option>').val(value.iso2).text(value.name));
+                                }
+                            }
+                            else{
+                                                                $('#BirthPlaceState').append($('<option></option>').val(value.iso2).text(value.name));
+                            }
                         });
+
+                        if (state !== "" && state !== null) {
+                            $('#BirthPlaceState').trigger('change');
+                        }
                     });
                 }
+
+               
             });
 
             $('#BirthPlaceState').change(function () {
+                var city = $("#hCity").val();
+
                 let countryIso = $('#BirthPlaceCountry').val();
                 let stateIso = $(this).val();
                 if (countryIso && stateIso) {
@@ -207,7 +280,17 @@
                         let cities = JSON.parse(data);
                         $('#BirthPlaceCity').empty().append('<option>Select City</option>');
                         $.each(cities, function (key, value) {
-                            $('#BirthPlaceCity').append($('<option></option>').val(value.name).text(value.name));
+                            if (city !== "" && city !== null) {
+                                if (city === value.name) {
+                                    $('#BirthPlaceCity').append($('<option></option>').val(value.name).text(value.name).prop('selected', true));
+                                }
+                                else {
+                                    $('#BirthPlaceCity').append($('<option></option>').val(value.name).text(value.name));
+                                }
+                            }
+                            else{
+                                $('#BirthPlaceCity').append($('<option></option>').val(value.name).text(value.name));
+                            }
                         });
                     });
                 }
@@ -218,7 +301,7 @@
         function previewImages() {
             const fileInput = document.getElementById('fileEmployee');
             const previewRow = document.getElementById('imagePreviewRow');
-            previewRow.innerHTML = ''; 
+            previewRow.innerHTML = '';
 
             Array.from(fileInput.files).forEach((file, index) => {
                 const reader = new FileReader();
@@ -228,10 +311,10 @@
                     imgDiv.style.backgroundColor = 'transparent';
 
                     imgDiv.innerHTML = `
-                            <img src="${e.target.result}" height="30" width="30" onclick="showImage('${e.target.result}')" alt="..."/>
-                            <br>
-                            <i class="bi bi-trash" onclick="removeImage(${index})"></i>
-                        `;
+                                    <img src="${e.target.result}" height="30" width="30" onclick="showImage('${e.target.result}')" alt="..."/>
+                                    <br>
+                                    <i class="bi bi-trash" onclick="removeImage(${index})"></i>
+                                `;
 
                     previewRow.appendChild(imgDiv);
                 };
@@ -239,7 +322,7 @@
             });
         }
 
-       
+
         function removeImage(index) {
             const fileInput = document.getElementById('fileEmployee');
             const dt = new DataTransfer();
@@ -247,7 +330,7 @@
 
             Array.from(files).forEach((file, i) => {
                 if (i !== index) {
-                    dt.items.add(file); 
+                    dt.items.add(file);
                 }
             });
 
@@ -280,7 +363,7 @@
         function previewImagesUpdate() {
             var files = document.getElementById('fileEmployee').files;
             var imagePreviewRow = document.getElementById('imagePreviewRow');
-            imagePreviewRow.innerHTML = ''; 
+            imagePreviewRow.innerHTML = '';
 
             for (var i = 0; i < files.length; i++) {
                 var reader = new FileReader();
@@ -335,10 +418,8 @@
                 type: 'DELETE',
                 url: '/Employees/DeleteImage/' + id,
                 success: function (response) {
-
-                    debugger;
                     if (response.success) {
-                        debugger;
+
                         Swal.fire(
                             'Deleted!',
                             'Your file has been deleted.',
@@ -366,6 +447,6 @@
 
     @{
         //enable client side validation
-            <partial name="_ValidationScriptsPartial" />
+                                        <partial name="_ValidationScriptsPartial" />
     }
 }

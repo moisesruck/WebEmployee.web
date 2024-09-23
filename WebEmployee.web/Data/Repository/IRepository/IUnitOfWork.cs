@@ -7,6 +7,7 @@
 
        
         IEmployeeImageRepository EmployeeImagee { get; }
+        IEmployeeTypeRepository EmployeeType { get; }
 
       
 

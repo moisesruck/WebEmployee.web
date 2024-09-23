@@ -27,7 +27,8 @@ namespace WebEmployee.web.Data.Repository
                 objFromdb.BirthPlaceCity = obj.BirthPlaceCity;
                 objFromdb.BirthPlaceCountry = obj.BirthPlaceCountry;
                 objFromdb.CreationTime = obj.CreationTime;
-
+                objFromdb.EmployeeTypeId = obj.EmployeeTypeId;
+                objFromdb.BossId = obj.BossId;
 
             }
 

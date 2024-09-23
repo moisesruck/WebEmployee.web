@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebEmployee.web.Models
 {
@@ -43,8 +44,13 @@ namespace WebEmployee.web.Models
         [ValidateNever]
         public List<EmployeeImage> EmployeeImages { get; set; }
 
-       
+        public int? EmployeeTypeId { get; set; }
+        [ForeignKey("EmployeeTypeId")]
+        public EmployeeType? EmployeeType { get; set; }
 
+        public int? BossId { get; set; }
+        [ForeignKey("BossId")]
+        public Employee? Boss { get; set; }
 
     }
 }

@@ -12,6 +12,7 @@ namespace WebEmployee.web.Data.Repository
 
       
         public IEmployeeImageRepository EmployeeImagee { get; private set; }
+        public IEmployeeTypeRepository EmployeeType { get; private set; }
      
 
 
@@ -26,6 +27,8 @@ namespace WebEmployee.web.Data.Repository
            
 
             EmployeeImagee = new EmployeeImageRepository(_db);
+
+            EmployeeType = new EmployeeTypeRepository(_db);
 
           
 

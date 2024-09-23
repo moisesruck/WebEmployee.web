@@ -95,7 +95,8 @@ namespace WebEmployee.web.Controllers
 
 
 
-
+            ViewBag.Employees = _unitOfWork.Employee.GetAll();
+            ViewBag.EmployeeTypes = _unitOfWork.EmployeeType.GetAll();
 
             if (id == null || id == 0)
             {
@@ -106,7 +107,7 @@ namespace WebEmployee.web.Controllers
             else
             {
                 //update
-                employee = _unitOfWork.Employee.Get(u => u.Id == id, includeProperties: "EmployeeImages");
+                employee = _unitOfWork.Employee.Get(u => u.Id == id, includeProperties: "EmployeeImages,");
 
                 return View(employee);
             }
@@ -178,6 +179,10 @@ namespace WebEmployee.web.Controllers
             }
             else
             {
+
+                ViewBag.Employees = _unitOfWork.Employee.GetAll();
+                ViewBag.EmployeeTypes = _unitOfWork.EmployeeType.GetAll();
+
                 return View(employe);
             }
         }

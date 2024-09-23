@@ -13,6 +13,7 @@ namespace WebEmployee.web.Data
 
         public DbSet<Employee> Employees { get; set; }
         public DbSet<EmployeeImage> EmployeeImagess { get; set; }
+        public DbSet<EmployeeType> EmployeeTypes { get; set; }
 
     }
 }
