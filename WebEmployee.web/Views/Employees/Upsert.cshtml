@@ -220,7 +220,7 @@
                 $('#BirthPlaceCountry').empty().append('<option>Select Country</option>');
                 $.each(countries, function (key, value) {
                     if (country !== "" && country !== null) {
-                        if (value.iso2 === country) {
+                        if (value.name === country) {
                             $('#BirthPlaceCountry').append($('<option></option>').val(value.iso2).text(value.name).prop('selected', true));
                         }
                         else {
@@ -249,7 +249,7 @@
                         $('#BirthPlaceState').empty().append('<option>Select State</option>');
                         $.each(states, function (key, value) {
                             if (state !== "" && state !== null) {
-                                if (state === value.iso2) {
+                                if (state === value.name) {
                                     $('#BirthPlaceState').append($('<option></option>').val(value.iso2).text(value.name).prop('selected', true));
                                 }
                                 else {

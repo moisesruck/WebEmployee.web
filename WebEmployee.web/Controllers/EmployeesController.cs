@@ -123,10 +123,26 @@ namespace WebEmployee.web.Controllers
 
                 if (employe.Id == 0)
                 {
+
+                    if(employe.BirthPlaceCountry != null)
+                    {
+                        employe.BirthPlaceCountry = HelperModel.Countries.Where(x => x.iso2 == employe.BirthPlaceCountry).Select(x => x.name).FirstOrDefault();
+                    }
+                    if(employe.BirthPlaceState != null) {
+                        employe.BirthPlaceState = HelperModel.States.Where(x => x.iso2 == employe.BirthPlaceState).Select(x => x.name).FirstOrDefault();
+                    }
                     _unitOfWork.Employee.Add(employe);
                 }
                 else
                 {
+                    if (employe.BirthPlaceCountry != null)
+                    {
+                        employe.BirthPlaceCountry = HelperModel.Countries.Where(x => x.iso2 == employe.BirthPlaceCountry).Select(x => x.name).FirstOrDefault();
+                    }
+                    if (employe.BirthPlaceState != null)
+                    {
+                        employe.BirthPlaceState = HelperModel.States.Where(x => x.iso2 == employe.BirthPlaceState).Select(x => x.name).FirstOrDefault();
+                    }
                     _unitOfWork.Employee.Update(employe);
                 }
 
