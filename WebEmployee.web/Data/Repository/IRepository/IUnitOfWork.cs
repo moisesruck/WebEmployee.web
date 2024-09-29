@@ -2,15 +2,9 @@
 {
     public interface IUnitOfWork
     {
-
         IEmployeeRepository Employee { get; }
-
-       
         IEmployeeImageRepository EmployeeImagee { get; }
         IEmployeeTypeRepository EmployeeType { get; }
-
-      
-
-        void Save();
+        Task SaveAsync();
     }
 }

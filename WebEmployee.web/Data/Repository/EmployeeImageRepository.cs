@@ -11,13 +11,11 @@ namespace WebEmployee.web.Data.Repository
         {
             _db = db;
         }
-
-
-        public void Update(EmployeeImage obj)
+        public async Task UpdateAsync(EmployeeImage obj)
         {
             _db.EmployeeImagess.Update(obj);
-
-
+            await _db.SaveChangesAsync();
         }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using WebEmployee.web.Data.Repository.IRepository;
+﻿using Microsoft.EntityFrameworkCore;
+using WebEmployee.web.Data.Repository.IRepository;
 using WebEmployee.web.Models;
 
 namespace WebEmployee.web.Data.Repository
@@ -11,27 +12,23 @@ namespace WebEmployee.web.Data.Repository
         {
             _db = db;
         }
-
-        public void Update(Employee obj)
+        public async Task UpdateAsync(Employee obj)
         {
-                
-            var objFromdb = _db.Employees.FirstOrDefault(u => u.Id == obj.Id);
+            var objFromDb = await _db.Employees.FirstOrDefaultAsync(u => u.Id == obj.Id);
 
-            if (objFromdb != null)
+            if (objFromDb != null)
             {
-                objFromdb.Name = obj.Name;
-                objFromdb.Lastname = obj.Lastname;
-                objFromdb.DateofBirth = obj.DateofBirth;
-                objFromdb.NationalId = obj.NationalId;
-                objFromdb.EmployeeBadge = obj.EmployeeBadge;
-                objFromdb.BirthPlaceCity = obj.BirthPlaceCity;
-                objFromdb.BirthPlaceCountry = obj.BirthPlaceCountry;
-                objFromdb.CreationTime = obj.CreationTime;
-                objFromdb.EmployeeTypeId = obj.EmployeeTypeId;
-                objFromdb.BossId = obj.BossId;
-
+                objFromDb.Name = obj.Name;
+                objFromDb.Lastname = obj.Lastname;
+                objFromDb.DateofBirth = obj.DateofBirth;
+                objFromDb.NationalId = obj.NationalId;
+                objFromDb.EmployeeBadge = obj.EmployeeBadge;
+                objFromDb.BirthPlaceCity = obj.BirthPlaceCity;
+                objFromDb.BirthPlaceCountry = obj.BirthPlaceCountry;
+                objFromDb.CreationTime = obj.CreationTime;
+                objFromDb.EmployeeTypeId = obj.EmployeeTypeId;
+                objFromDb.BossId = obj.BossId;
             }
-
         }
     }
 }

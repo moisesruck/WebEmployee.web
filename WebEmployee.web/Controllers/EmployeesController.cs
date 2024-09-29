@@ -16,232 +16,191 @@ namespace WebEmployee.web.Controllers
             _unitOfWork = unitOfWork;
             _webHostEnvironment = webHostEnvironment;
         }
-        public IActionResult Index(List<Employee> employees)
-        {
 
+        public async Task<IActionResult> Index(List<Employee> employees)
+        {
             return View();
         }
 
-
         [HttpPost]
-        public IActionResult Index(IFormFile file)
+        public async Task<IActionResult> Index(IFormFile file)
         {
             string wwwRootPath = _webHostEnvironment.WebRootPath;
 
             #region Upload CSV
-            //string fileNamee = Path.Combine(wwwRootPath, @"files", file.FileName);
             string filepath = Path.Combine(wwwRootPath, @"files");
 
             if (!string.IsNullOrEmpty(file.FileName))
             {
-                //in this case we need to delete old image
-                //remove the backward slash, it has to backward slashes, one is to scape. 
                 var oldImagePath = Path.Combine(filepath, file.FileName.TrimStart('\\'));
 
-                //if anything exists in that image path, it will be deleted
                 if (System.IO.File.Exists(oldImagePath))
                 {
                     System.IO.File.Delete(oldImagePath);
                 }
             }
 
-
-            //copy file to the location configured
-            //updload
             using (var fileStream = new FileStream(Path.Combine(filepath, file.FileName), FileMode.Create))
             {
-                file.CopyTo(fileStream);
+                await file.CopyToAsync(fileStream);
             }
-
             #endregion
 
-            var employees = this.GetEmployeeList(file.FileName);
-            return Index(employees);
+            var employees = await GetEmployeeListAsync(file.FileName);
+            return await Index(employees);
         }
 
-        private List<Employee> GetEmployeeList(string filename)
+        private async Task<List<Employee>> GetEmployeeListAsync(string filename)
         {
-            List<Employee> employeess = new List<Employee>();
-
+            List<Employee> employees = new List<Employee>();
             string wwwRootPath = _webHostEnvironment.WebRootPath;
             string filepath = Path.Combine(wwwRootPath, @"files");
-            #region Read CSV
             var path = Path.Combine(filepath, filename);
 
+            #region Read CSV
             using (var reader = new StreamReader(path))
             using (var csv = new CsvHelper.CsvReader(reader, CultureInfo.InvariantCulture))
             {
-                csv.Read();
+                await csv.ReadAsync();
                 csv.ReadHeader();
-                while (csv.Read())
+                while (await csv.ReadAsync())
                 {
-                    var medicalcondition = csv.GetRecord<Employee>();
-                    medicalcondition.Id = 0;
-                    employeess.Add(medicalcondition);
-                    _unitOfWork.Employee.Add(medicalcondition);
+                    var employee = csv.GetRecord<Employee>();
+                    employee.Id = 0;
+                    employees.Add(employee);
+                    await _unitOfWork.Employee.AddAsync(employee);
                 }
             }
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
             TempData["success"] = "Employee creado exitosamente";
-
             #endregion
 
-            return employeess;
+            return employees;
         }
 
-        public IActionResult Upsert(int? id)
+        public async Task<IActionResult> Upsert(int? id)
         {
             Employee employee = new();
 
-
-
-            ViewBag.Employees = _unitOfWork.Employee.GetAll();
-            ViewBag.EmployeeTypes = _unitOfWork.EmployeeType.GetAll();
+            ViewBag.Employees = await _unitOfWork.Employee.GetAllAsync();
+            ViewBag.EmployeeTypes = await _unitOfWork.EmployeeType.GetAllAsync();
 
             if (id == null || id == 0)
             {
-                //Create
-
                 return View(employee);
             }
             else
             {
-                //update
-                employee = _unitOfWork.Employee.Get(u => u.Id == id, includeProperties: "EmployeeImages,");
-
+                employee = await _unitOfWork.Employee.GetAsync(u => u.Id == id, includeProperties: "EmployeeImages");
                 return View(employee);
             }
-
         }
 
         [HttpPost]
-        public IActionResult Upsert(Employee employe, List<IFormFile> filess)
+        public async Task<IActionResult> Upsert(Employee employee, List<IFormFile> filess)
         {
             if (ModelState.IsValid)
             {
-                employe.CreationTime = DateTime.Now;
+                employee.CreationTime = DateTime.Now;
 
-                if (employe.Id == 0)
+                if (employee.BirthPlaceCountry != null)
                 {
+                    employee.BirthPlaceCountry = HelperModel.Countries.Where(x => x.iso2 == employee.BirthPlaceCountry).Select(x => x.name).FirstOrDefault();
+                }
+                if (employee.BirthPlaceState != null)
+                {
+                    employee.BirthPlaceState = HelperModel.States.Where(x => x.iso2 == employee.BirthPlaceState).Select(x => x.name).FirstOrDefault();
+                }
 
-                    if(employe.BirthPlaceCountry != null)
-                    {
-                        employe.BirthPlaceCountry = HelperModel.Countries.Where(x => x.iso2 == employe.BirthPlaceCountry).Select(x => x.name).FirstOrDefault();
-                    }
-                    if(employe.BirthPlaceState != null) {
-                        employe.BirthPlaceState = HelperModel.States.Where(x => x.iso2 == employe.BirthPlaceState).Select(x => x.name).FirstOrDefault();
-                    }
-                    _unitOfWork.Employee.Add(employe);
+                if (employee.Id == 0)
+                {
+                    await _unitOfWork.Employee.AddAsync(employee);
                 }
                 else
                 {
-                    if (employe.BirthPlaceCountry != null)
-                    {
-                        employe.BirthPlaceCountry = HelperModel.Countries.Where(x => x.iso2 == employe.BirthPlaceCountry).Select(x => x.name).FirstOrDefault();
-                    }
-                    if (employe.BirthPlaceState != null)
-                    {
-                        employe.BirthPlaceState = HelperModel.States.Where(x => x.iso2 == employe.BirthPlaceState).Select(x => x.name).FirstOrDefault();
-                    }
-                    _unitOfWork.Employee.Update(employe);
+                    await _unitOfWork.Employee.UpdateAsync(employee);
                 }
 
-                //_unitOfWork.Productt.Add(productVM.Product);
-                _unitOfWork.Save();
+                await _unitOfWork.SaveAsync();
 
-
-                string wwwRootPathh = _webHostEnvironment.WebRootPath;
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
 
                 if (filess != null)
                 {
-                    foreach (IFormFile file in filess)
+                    foreach (var file in filess)
                     {
-                        //configure location
                         string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                        string employeepath = @"images\employee\employee-" + employe.Id;
-                        string finalPath = Path.Combine(wwwRootPathh, employeepath);
+                        string employeePath = @"images\employee\employee-" + employee.Id;
+                        string finalPath = Path.Combine(wwwRootPath, employeePath);
 
-                        //create location if it does not exist
                         if (!Directory.Exists(finalPath))
                         {
                             Directory.CreateDirectory(finalPath);
                         }
 
-                        //upload file to the location configured
                         using (var fileStream = new FileStream(Path.Combine(finalPath, fileName), FileMode.Create))
                         {
-                            file.CopyTo(fileStream);
+                            await file.CopyToAsync(fileStream);
                         }
 
-                        //create a ptientimage with the info of the image just uploaded
-                        EmployeeImage EmployeeImage = new EmployeeImage()
+                        EmployeeImage employeeImage = new EmployeeImage()
                         {
-                            ImageUrl = @"\" + employeepath + @"\" + fileName,
-                            EmployeeId = employe.Id
+                            ImageUrl = @"\" + employeePath + @"\" + fileName,
+                            EmployeeId = employee.Id
                         };
 
-                        ////Confirm Pacient images is not null, if it is, initialize it
-                        //if (employe.EmployeeImages == null)
-                        //{
-                        //    employe.EmployeeImages = new List<EmployeeImage>();
-                        //}
-                        _unitOfWork.EmployeeImagee.Add(EmployeeImage);
-                        _unitOfWork.Save();
-
+                        await _unitOfWork.EmployeeImagee.AddAsync(employeeImage);
                     }
+
+                    await _unitOfWork.SaveAsync();
                 }
-                TempData["success"] = "Empleado public creado exitosamente";
+
+                TempData["success"] = "Empleado creado exitosamente";
                 return RedirectToAction("Index", "Employees");
             }
             else
             {
-
-                ViewBag.Employees = _unitOfWork.Employee.GetAll();
-                ViewBag.EmployeeTypes = _unitOfWork.EmployeeType.GetAll();
-
-                return View(employe);
+                ViewBag.Employees = await _unitOfWork.Employee.GetAllAsync();
+                ViewBag.EmployeeTypes = await _unitOfWork.EmployeeType.GetAllAsync();
+                return View(employee);
             }
         }
 
         #region API CALLS
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            List<Employee> objCategoryList = _unitOfWork.Employee.GetAll().ToList();
-            //List<Employee> employeeList = _unitOfWork.Employee.GetAll(includeProperties: "Position").ToList();
-            return Json(new { data = objCategoryList });
+            var employeeList = (await _unitOfWork.Employee.GetAllAsync()).ToList();
+            return Json(new { data = employeeList });
         }
 
         [HttpDelete]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
+            var employeeToBeDeleted = await _unitOfWork.Employee.GetAsync(u => u.Id == id);
 
-            var productToBeDeleted = _unitOfWork.Employee.Get(u => u.Id == id);
-
-            if (productToBeDeleted == null)
+            if (employeeToBeDeleted == null)
             {
                 return Json(new { success = false, message = "Error while deleting" });
             }
 
-
-            _unitOfWork.Employee.Remove(productToBeDeleted);
-            _unitOfWork.Save();
-
-            List<Employee> objCategoryList = _unitOfWork.Employee.GetAll().ToList();
+            _unitOfWork.Employee.Remove(employeeToBeDeleted);
+            await _unitOfWork.SaveAsync();
             return Json(new { success = true, message = "Delete Successful" });
         }
-        [HttpDelete]
-        public IActionResult DeleteImage(int? id)
-        {
 
-            var employeeImage = _unitOfWork.EmployeeImagee.Get(u => u.Id == id);
+        [HttpDelete]
+        public async Task<IActionResult> DeleteImage(int? id)
+        {
+            var employeeImage = await _unitOfWork.EmployeeImagee.GetAsync(u => u.Id == id);
 
             if (employeeImage == null)
             {
                 return Json(new { success = false, message = "Error while deleting" });
             }
+
             _unitOfWork.EmployeeImagee.Remove(employeeImage);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
             return Json(new { success = true, message = "Delete Successful" });
         }
         #endregion

@@ -11,13 +11,11 @@ namespace WebEmployee.web.Data.Repository
         {
             _db = db;
         }
-
-
-        public void Update(EmployeeType obj)
+        public async Task UpdateAsync(EmployeeType obj)
         {
             _db.EmployeeTypes.Update(obj);
-
-
+            await _db.SaveChangesAsync();
         }
+
     }
 }
